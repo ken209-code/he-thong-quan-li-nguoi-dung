@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Quản Lý Người Dùng</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #111827 50%, #1e1b4b 100%);
+            --glass-bg: rgba(30, 41, 59, 0.45);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --accent-primary: #8b5cf6;
+            --accent-secondary: #ec4899;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --success: #10b981;
+            --danger: #ef4444;
+            --input-bg: rgba(15, 23, 42, 0.5);
+            --shadow-glow: 0 15px 35px rgba(139, 92, 246, 0.15);
+            --shadow-soft: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            color: var(--text-primary);
+            padding: 50px 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        .btn-back-home {
+            align-self: flex-start;
+            margin-bottom: 20px;
+            color: #a78bfa;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        
+        .btn-back-home:hover {
+            transform: translateX(-4px);
+            color: var(--accent-secondary);
+            background: rgba(30, 41, 59, 0.8);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        header h1 {
+            font-size: 2.3rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+        }
+
+        header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            font-weight: 300;
+        }
+
+        /* Alert notifications */
+        .alert-container {
+            width: 100%;
+            max-width: 1200px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 20px;
+            border-radius: 14px;
+            font-size: 0.95rem;
+            font-weight: 550;
+            border: 1px solid transparent;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: rgba(16, 185, 129, 0.25);
+            color: #34d399;
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.25);
+            color: #f87171;
+        }
+
+        .app-layout {
+            display: grid;
+            grid-template-columns: 420px 1fr;
+            gap: 30px;
+            width: 100%;
+            max-width: 1200px;
+            align-items: start;
+        }
+
+        @media (max-width: 1024px) {
+            .app-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-soft);
+            padding: 35px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: rgba(255, 255, 255, 0.14);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            background: var(--input-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 14px 16px;
+            color: var(--text-primary);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+            margin-bottom: 30px;
+            cursor: pointer;
+        }
+
+        .checkbox-input {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--accent-primary);
+            cursor: pointer;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .btn-action {
+            padding: 13px 18px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            text-align: center;
+        }
+
+        .btn-create { background: linear-gradient(135deg, var(--accent-primary) 0%, #6d28d9 100%); color: white; }
+        .btn-update { background: linear-gradient(135deg, #10b981 0%, #047857 100%); color: white; }
+        .btn-delete { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; }
+        .btn-reset { background: rgba(255, 255, 255, 0.08); color: var(--text-primary); border: 1px solid var(--glass-border); }
+
+        .btn-action:hover { transform: translateY(-2px); filter: brightness(1.1); }
+
+        /* Search input bar wrapper */
+        .search-wrapper {
+            margin-bottom: 25px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .search-input {
+            flex: 1;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .user-table th {
+            background: rgba(15, 23, 42, 0.4);
+            color: var(--accent-secondary);
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 16px 20px;
+            border-bottom: 2px solid var(--glass-border);
+            text-align: left;
+        }
+
+        .user-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            font-size: 0.95rem;
+        }
+
+        .badge-admin {
+            background: rgba(236, 72, 153, 0.15);
+            color: #f472b6;
+            padding: 4px 10px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            border: 1px solid rgba(236, 72, 153, 0.3);
+        }
+
+        .badge-user {
+            background: rgba(139, 92, 246, 0.15);
+            color: #a78bfa;
+            padding: 4px 10px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .action-link {
+            color: #60a5fa;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .action-link:hover { text-decoration: underline; color: #93c5fd; }
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="btn-back-home">← Quay về trang chủ</a>
+
+    <header>
+        <h1>Hệ Thống Quản Lý Người Dùng</h1>
+        <p>Thực thi và lưu trữ thời gian thực (Local Database Mode)</p>
+    </header>
+
+    <div class="alert-container" id="alertContainer">
+        <div class="alert" id="alertBox"></div>
+    </div>
+
+    <div class="app-layout">
+        <div class="card">
+            <div class="card-title" id="formTitle">Thêm Người Dùng Mới</div>
+            <form id="userForm" onsubmit="handleFormSubmit(event)">
+                <div class="form-group">
+                    <label for="id">Mã Người Dùng (ID)</label>
+                    <input type="text" id="id" class="form-input" placeholder="Nhập mã định danh..." required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Mật Khẩu</label>
+                    <input type="password" id="password" class="form-input" placeholder="••••••••" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="fullname">Họ và Tên</label>
+                    <input type="text" id="fullname" class="form-input" placeholder="Nhập họ tên đầy đủ..." required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Địa Chỉ Email</label>
+                    <input type="email" id="email" class="form-input" placeholder="name@example.com" required>
+                </div>
+
+                <div class="checkbox-container">
+                    <input type="checkbox" id="admin" class="checkbox-input">
+                    <label for="admin" class="checkbox-label">Cấp quyền Quản Trị Viên (Admin)</label>
+                </div>
+
+                <div class="button-grid">
+                    <button type="submit" id="btnSave" class="btn-action btn-create">Lưu lại</button>
+                    <button type="button" id="btnUpdate" class="btn-action btn-update" onclick="updateUser()" disabled>Cập nhật</button>
+                    <button type="button" id="btnDelete" class="btn-action btn-delete" onclick="deleteUser()" disabled>Xóa bỏ</button>
+                    <button type="button" class="btn-action btn-reset" onclick="resetForm()">Đặt lại</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Danh Sách Tài Khoản</div>
+            
+            <div class="search-wrapper">
+                <input type="text" id="searchInput" class="form-input search-input" placeholder="Tìm kiếm theo mã ID hoặc họ tên..." oninput="renderTable()">
+            </div>
+
+            <div class="table-responsive">
+                <table class="user-table">
+                    <thead>
+                        <tr>
+                            <th>Mã ID</th>
+                            <th>Họ Tên</th>
+                            <th>Email</th>
+                            <th>Vai Trò</th>
+                            <th>Thao Tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Khởi tạo cơ sở dữ liệu mẫu nếu chưa có dữ liệu trong LocalStorage
+        if (!localStorage.getItem('users')) {
+            const sampleUsers = [
+                { id: "NV01", password: "123", fullname: "Nguyễn Văn Anh", email: "anhnv@poly.edu.vn", admin: true },
+                { id: "NV02", password: "123", fullname: "Trần Thị Bình", email: "binhtt@poly.edu.vn", admin: false },
+                { id: "NV03", password: "123", fullname: "Lê Hoàng Long", email: "longlh@poly.edu.vn", admin: false }
+            ];
+            localStorage.setItem('users', JSON.stringify(sampleUsers));
+        }
+
+        // Đọc dữ liệu từ LocalStorage
+        function getUsers() {
+            return JSON.parse(localStorage.getItem('users')) || [];
+        }
+
+        // Lưu dữ liệu vào LocalStorage
+        function saveUsers(users) {
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+
+        // Hiện thông báo (Alert)
+        function showAlert(msg, isSuccess = true) {
+            const container = document.getElementById('alertContainer');
+            const box = document.getElementById('alertBox');
+            box.className = `alert ${isSuccess ? 'alert-success' : 'alert-danger'}`;
+            box.innerText = msg;
+            container.style.display = 'block';
+            setTimeout(() => { container.style.display = 'none'; }, 3000);
+        }
+
+        // Hiển thị danh sách lên bảng
+        function renderTable() {
+            const users = getUsers();
+            const searchKeyword = document.getElementById('searchInput').value.toLowerCase().trim();
+            const tbody = document.getElementById('userTableBody');
+            tbody.innerHTML = '';
+
+            const filteredUsers = users.filter(u => 
+                u.id.toLowerCase().includes(searchKeyword) || 
+                u.fullname.toLowerCase().includes(searchKeyword)
+            );
+
+            if(filteredUsers.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: var(--text-secondary);">Không tìm thấy tài khoản hợp lệ.</td></tr>`;
+                return;
+            }
+
+            filteredUsers.forEach(user => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong style="color:#fff;">${user.id}</strong></td>
+                    <td>${user.fullname}</td>
+                    <td>${user.email}</td>
+                    <td><span class="${user.admin ? 'badge-admin' : 'badge-user'}">${user.admin ? 'Quản trị' : 'Người dùng'}</span></td>
+                    <td><a class="action-link" onclick="editUser('${user.id}')">Sửa / Xem</a></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Xử lý khi nhấn nút Lưu Lại (Thêm mới)
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('id').value.trim();
+            const password = document.getElementById('password').value;
+            const fullname = document.getElementById('fullname').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const admin = document.getElementById('admin').checked;
+
+            let users = getUsers();
+
+            // Kiểm tra trùng Mã ID
+            if (users.some(u => u.id.toLowerCase() === id.toLowerCase())) {
+                showAlert(`Mã định danh ${id} đã tồn tại trong hệ thống!`, false);
+                return;
+            }
+
+            users.push({ id, password, fullname, email, admin });
+            saveUsers(users);
+            showAlert("Thêm tài khoản mới thành công!");
+            resetForm();
+            renderTable();
+        }
+
+        // Đổ dữ liệu từ bảng ngược vào form khi nhấn "Sửa"
+        function editUser(id) {
+            const users = getUsers();
+            const user = users.find(u => u.id === id);
+            if (!user) return;
+
+            document.getElementById('id').value = user.id;
+            document.getElementById('id').readOnly = true; // Không cho sửa khóa chính ID
+            document.getElementById('password').value = user.password;
+            document.getElementById('fullname').value = user.fullname;
+            document.getElementById('email').value = user.email;
+            document.getElementById('admin').checked = user.admin;
+
+            document.getElementById('formTitle').innerText = "Cập Nhật Thông Tin";
+            document.getElementById('btnSave').disabled = true;
+            document.getElementById('btnUpdate').disabled = false;
+            document.getElementById('btnDelete').disabled = false;
+        }
+
+        // Cập nhật người dùng
+        function updateUser() {
+            const id = document.getElementById('id').value;
+            const password = document.getElementById('password').value;
+            const fullname = document.getElementById('fullname').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const admin = document.getElementById('admin').checked;
+
+            let users = getUsers();
+            const index = users.findIndex(u => u.id === id);
+
+            if (index !== -1) {
+                users[index] = { id, password, fullname, email, admin };
+                saveUsers(users);
+                showAlert("Cập nhật thông tin thành công!");
+                resetForm();
+                renderTable();
+            }
+        }
+
+        // Xóa tài khoản
+        function deleteUser() {
+            const id = document.getElementById('id').value;
+            if (confirm(`Bạn chắc chắn muốn xóa tài khoản ${id}?`)) {
+                let users = getUsers();
+                users = users.filter(u => u.id !== id);
+                saveUsers(users);
+                showAlert("Đã xóa tài khoản khỏi hệ thống!");
+                resetForm();
+                renderTable();
+            }
+        }
+
+        // Reset form về trạng thái ban đầu
+        function resetForm() {
+            document.getElementById('userForm').reset();
+            document.getElementById('id').readOnly = false;
+            document.getElementById('formTitle').innerText = "Thêm Người Dùng Mới";
+            document.getElementById('btnSave').disabled = false;
+            document.getElementById('btnUpdate').disabled = true;
+            document.getElementById('btnDelete').disabled = true;
+        }
+
+        // Gọi hiển thị danh sách ngay khi tải trang xong
+        window.onload = renderTable;
+    </script>
+</body>
+</html>
